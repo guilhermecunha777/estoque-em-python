@@ -1,93 +1,64 @@
-from database.db import criar_tabela
 from repositories import produto_repository
+from database.db import criar_tabela
 import os
-
-def limpar_tela():
-    os.system('cls' if os.name == 'nt' else 'clear')    
-
-def input_int(mensagem):
-    while True:
-        try:
-            valor = int(input(mensagem))
-            if valor < 0:
-                print("valor não pode ser negativo!")
-                continue
-            return valor
-        except ValueError:
-            print("por favor, insira um numero valido.")
-
-def input_texto(mensagem):
-    while True:
-        valor = input(mensagem).strip()
-        if valor == "":
-            print("o campo não pode ser vazio!")
-        else:
-            return valor
 
 def menu():
     while True:
-        limpar_tela()
-        print("\n=== Sistema de Controle de Estoque ===")
-        print("1️⃣  Adicionar Produto")
-        print("2️⃣  Listar Produtos")
-        print("3️⃣  Editar Produto")
-        print("4️⃣  Deletar Produto")
-        print("5️⃣  Gerar Relatório CSV")
-        print("0️⃣  Sair")
-        
-        opcao = input("Escolha uma opção: ")
+        print("\n" + "=" * 40)
+        print("🧠 SISTEMA DE CONTROLE DE ESTOQUE 🧠")
+        print("=" * 40)
+        print("1. Adicionar produto")
+        print("2. Listar produtos")
+        print("3. Deletar produto")
+        print("4. Buscar produto por nome")
+        print("6. Editar produto")
+        print("5. Gerar relatório CSV")
+        print("0. Sair")
 
-        if opcao == '1':
-            nome = input_texto("Nome do produto: ")
-            quantidade = input_int("Quantidade: ")
-            caminho_foto = input_texto("Caminho da foto: ")
-            produto_repository.adicionar_produto(nome, quantidade, caminho_foto)
-            print("\n✅ Produto adicionado com sucesso!\n")
-            input("Pressione Enter para continuar...")
+        opcao = input("\nEscolha uma opção: ").strip()
 
-        elif opcao == '2':
-            produtos = produto_repository.listar_produtos()
-            if not produtos:
-                print("\n🚫 Nenhum produto cadastrado.\n")
+        if opcao == "1":
+            produto_repository.adicionar_produto()
+
+        elif opcao == "2":
+            produto_repository.listar_produtos()
+
+        elif opcao == "3":
+            id_produto = input("digite o ID do produto que deseja deletar: ").strip()
+            if id_produto.isdigit():
+                produto_repository.deletar_produto(int(id_produto))
+                print("item deletado")
             else:
-                print("\n📦 Produtos em Estoque:\n")
-                print(f"{'ID':<5}{'Nome':<20}{'Qtd':<10}{'Foto'}")
-                print("-" * 50)
-                for produto in produtos:
-                    print(f"{produto.id:<5}{produto.nome:<20}{produto.quantidade:<10}{produto.caminho_foto}")
-            input("\nPressione Enter para continuar...")
+                print("ID invalido")
 
-        elif opcao == '3':
-            id = input_int("ID do produto que deseja editar: ")
-            novo_nome = input_texto("Novo nome: ")
-            nova_quantidade = input_int("Nova quantidade: ")
-            novo_caminho_foto = input_texto("Novo caminho da foto: ")
-            produto_repository.editar_produto(id, novo_nome, nova_quantidade, novo_caminho_foto)
-            print("\n✅ Produto atualizado com sucesso!\n")
-            input("Pressione Enter para continuar...")
+        elif opcao == "4":
+            produto_repository.buscar_produto_por_nome()
 
-        elif opcao == '4':
-            id = input_int("ID do produto que deseja deletar: ")
-            confirmacao = input(f"tem certeza que quer deletar o produto id {id}? (s/n): ").lower()
-            if confirmacao == 's':
-                produto_repository.deletar_produto(id)
-                print("\n✅ Produto deletado com sucesso!\n")
+        elif opcao == "5":
+            produto_repository.gerar_relatorio_csv()
+
+        elif opcao == "6":
+            id_produto = input("Digite o ID do produto que deseja editar: ").strip()
+            if id_produto.isdigit():
+                novo_nome = input("Novo nome do produto: ").strip()
+                nova_quantidade = input("Nova quantidade: ").strip()
+                if not nova_quantidade.isdigit():
+                    print("🚫 Quantidade inválida.")
+                    return
+                produto_repository.editar_produto(
+                    int(id_produto),
+                    novo_nome,
+                    int(nova_quantidade))
             else:
-                print("\n🚫 Operação cancelada.\n")
-            input("Pressione Enter para continuar...")
-        
-        elif opcao == '5':
-            from relatorios.gerador_csv import gerar_relatorio_csv
-            gerar_relatorio_csv()
-            input("Pressione Enter para continuar...")
+                print("🚫 ID inválido.")
 
-        elif opcao == '0':
-            print("👋 Saindo do sistema...")
+
+        elif opcao == "0":
+            print("Saindo do sistema. Até mais!")
             break
 
         else:
-            print("🚫 Opção inválida. Tente novamente!")
-            input("Pressione Enter para continuar...")
+            print("🚫 Opção inválida. Tente novamente.")
 
 if __name__ == "__main__":
     criar_tabela()
