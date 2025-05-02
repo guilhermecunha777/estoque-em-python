@@ -101,7 +101,7 @@ def gerar_relatorio_csv():
         conn.close()
         
         with open("relatorio_estoque.csv", mode="w", newline="", encoding="utf-8") as file:
-            writer = csv
+            writer = csv.writer(file)
             writer.writerow(["ID", "Nome", "Quantidade"])
             writer.writerows(produto)
         

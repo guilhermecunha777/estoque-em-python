@@ -43,22 +43,21 @@ def menu():
                 novo_nome = input("Novo nome do produto: ").strip()
                 nova_quantidade = input("Nova quantidade: ").strip()
                 if not nova_quantidade.isdigit():
-                    print("🚫 Quantidade inválida.")
+                    print("Quantidade inválida.")
                     return
                 produto_repository.editar_produto(
                     int(id_produto),
                     novo_nome,
                     int(nova_quantidade))
             else:
-                print("🚫 ID inválido.")
-
+                print("ID inválido.")
 
         elif opcao == "0":
             print("Saindo do sistema. Até mais!")
             break
 
         else:
-            print("🚫 Opção inválida. Tente novamente.")
+            print("Opção inválida. Tente novamente.")
 
 if __name__ == "__main__":
     criar_tabela()
