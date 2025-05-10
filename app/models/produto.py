@@ -1,9 +1,9 @@
 class Produto:
-    def __init__(self, id, nome, quantidade, caminho_foto):
+    def __init__(self, id: int, nome: str, quantidade: int, imagem: str = Nones):
         self.id = id
         self.nome = nome
         self.quantidade = quantidade
-        self.caminho_foto = caminho_foto
+        self.imagem = imagem
 
     def __str__(self):
-        return f"ID: {self.id} | Nome: {self.nome} | Quantidade: {self.quantidade} | Foto: {self.caminho_foto}"
+        return f"<produto id={self.id}, nome={self.nome}, quantidade={self.quantidade}, imagem={self.imagem}>"

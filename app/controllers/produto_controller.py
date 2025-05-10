@@ -1,41 +1,38 @@
 from fastapi import APIRouter, HTTPException
-from repositories import produto_repository
-from schemas import ProdutoCreate, ProdutoUpdate, ProdutoOut
 from typing import List
+from schemas import ProdutoCreate, ProdutoUpdate, ProdutoOut
+from repositories import produto_repository
 
-router = APIRouter()
+router = APIRouter(prefix="/produtos", tags=["Produtos"])
 
-@router.get("/produtos", response_model=List[ProdutoOut])
+@router.get("/", response_model=List[ProdutoOut], summary="Listar todos os produtos")
 def listar_produtos():
     try:
         produtos = produto_repository.listar_produtos()
-        return [
-            ProdutoOut(id=p[0], nome=p[1], quantidade=p[2], imagem=None) for p in produtos
-        ]
+        return produtos
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=f"Erro ao listar produtos: {str(e)}")
 
-@router.post("/produtos", response_model=ProdutoOut)
+@router.post("/", response_model=ProdutoOut, summary="Adicionar um novo produto")
 def adicionar_produto(produto: ProdutoCreate):
     try:
-        produto_repository.adicionar_produto(produto.nome, produto.quantidade)
-        # Simulando retorno, já que a função original não retorna o novo produto:
-        return ProdutoOut(id=0, nome=produto.nome, quantidade=produto.quantidade, imagem=None)
+        novo_produto = produto_repository.adicionar_produto(produto.nome, produto.quantidade)
+        return novo_produto
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erro ao adicionar produto: {str(e)}")
 
-@router.put("/produtos/{id}", response_model=ProdutoOut)
+@router.put("/{id}", response_model=ProdutoOut, summary="Editar um produto existente")
 def editar_produto(id: int, produto: ProdutoUpdate):
     try:
-        produto_repository.editar_produto(id, produto.nome, produto.quantidade)
-        return ProdutoOut(id=id, nome=produto.nome, quantidade=produto.quantidade, imagem=None)
+        produto_atualizado = produto_repository.editar_produto(id, produto.nome, produto.quantidade)
+        return produto_atualizado
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erro ao editar produto: {str(e)}")
 
-@router.delete("/produtos/{id}")
+@router.delete("/{id}", summary="Deletar um produto")
 def deletar_produto(id: int):
     try:
         produto_repository.deletar_produto(id)
-        return {"mensagem": "produto deletado com sucesso"}
+        return {"mensagem": "Produto deletado com sucesso"}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"erro ao deletar produto: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Erro ao deletar produto: {str(e)}")

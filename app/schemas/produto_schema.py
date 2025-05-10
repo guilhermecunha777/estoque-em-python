@@ -9,7 +9,7 @@ class ProdutoCreate(ProdutoBase):
     pass
 
 class ProdutoUpdate(ProdutoBase):
-    id: int
+    pass
 
 class ProdutoOut(ProdutoBase):
     id: int

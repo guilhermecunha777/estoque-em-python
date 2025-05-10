@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>estoque de produtos</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #333;
+            color: #fff;
+            padding: 10px 20px;
+        }
+
+        button {
+            padding: 5px 10px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+
+        #produto-form, #lista-produto {
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #333;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>estoque de produtos</h1>
+        <button onclick="gerarRelatorio()">gerar Relatorio csv</button>
+    </header>
+    
+    <section id="produto-form">
+        <h2>adicionar produto</h2>
+        <input type="text" id="nome" placeholder="nome do produto">
+        <input type="number" id="quantidade" placeholder="quantidade">
+        <button onclick="adicionarproduto()">adicionar</button>
+    </section>
+
+    <section id="lista-produtos">
+        <h2>lista de produtos</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>nome</th>
+                    <th>quantidade</th>
+                    <th>ações</th>
+                </tr>
+            </thead>
+            <tbody id="produtos"></tbody>
+        </table>
+    </section>
+
+    <script>
+        async function listaprodutos() {
+            const reponse = await fetch("http://127.0.0.1:8000/produtos");
+            const produtos = await Response.json();
+            const tbody = document.getElementById("produtos");
+            tbody.innerHTML="";
+            produtos.forEach(produto => {
+                const row `<tr>
+                    <td>${produto.id}</td>
+                    <td>${produto.nome}</td>
+                    <td>${produto.quantidade}</td>
+                    <td>
+                        <button onclick="editarProduto(${produto.id})">Editar</button>
+                        <button onclick="deletarProduto(${produto.id})">Excluir</button>
+                    </td>
+                </tr>`;
+                tbody.innerHTML += row;
+            });
+        }
+        async function adicionarproduto() {
+            const nome = document.getElementById("nome").value;
+            const quantidade = parseInt(document.getElementById("quantidade").value);
+            await fetch("http://127.0.0.1:8000/produtos", {
+                method: "POST",
+                headers: {"content-type": "application/json"},
+                body; JSON.stringify({ nome, quantidade })
+            });
+            listaprodutos();
+        }
+        async function deletarProduto(ID) {
+            const reponse = await fetch("http://127.0.0.1:8000/relatorio/csv")
+            const blob = await reponse.blob();
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "relatorio_estoque.csv";
+            link.click();
+        }
+        listaprodutos();
+    </script>
+</body>
+</html>

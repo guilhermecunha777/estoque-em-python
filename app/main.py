@@ -1,18 +1,27 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import StreamingResponse
+from pydantic import BaseModel
+from typing import Optional
 import io
 import csv
 
-from repositories import produto_repository
-from controllers import produto_controller
+from app.repositories import produto_repository
+from app.controllers import produto_controller
+from database.init_db import inicializar_banco
 
-app = FastAPI(title="Sistema de Controle de Estoque")
+app = FastAPI(title="Sistema de Estoque")
 
-# Inclui as rotas do controller
+inicializar_banco()
+
 app.include_router(produto_controller.router)
 
+class ProdutoIn(BaseModel):
+    nome: str
+    quantidade: int
+
+# Rota adicional para gerar relatório em CSV
 @app.get("/relatorio/csv", summary="Gerar relatório CSV de produtos")
-def gerar_relatorio_csv_api():
+def gerar_relatorio_csv():
     try:
         produtos = produto_repository.listar_produtos()
 
@@ -23,10 +32,7 @@ def gerar_relatorio_csv_api():
             writer.writerow(prod[:3])
 
         buffer.seek(0)
-        return StreamingResponse(
-            buffer,
-            media_type="text/csv",
-            headers={"Content-Disposition": "attachment; filename=relatorio_estoque.csv"}
-        )
+        return StreamingResponse(buffer, media_type="text/csv",
+                                headers={"Content-Disposition": "attachment; filename=relatorio_estoque.csv"})
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erro ao gerar relatório: {str(e)}")

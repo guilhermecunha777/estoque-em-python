@@ -1,18 +1,13 @@
 import sqlite3
+import os
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.path.join(BASE_DIR, '..', '..', 'estoque.db')
 
 def conectar():
-    return sqlite3.connect('produtos.db')
-
-def criar_tabela():
-    conn = conectar()
-    cursor = conn.cursor()
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS produtos (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            nome TEXT NOT NULL,
-            quantidade INTEGER NOT NULL,
-            caminho_foto TEXT
-        );
-    ''')
-    conn.commit()
-    conn.close()
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        return conn
+    except sqlite3.Error as e:
+        print(f"erro ao conectar ao banco de dados:{e}")
+        return None
